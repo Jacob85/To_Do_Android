@@ -1,0 +1,16 @@
+<resources>
+
+    <string name="app_name">Smart To Do List</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="add_button">Add Task</string>
+    <string name="done_button">Create</string>
+    <string name="Task_Done">Done</string>
+    <string name="title_activity_add_new_task">Add New Task</string>
+    <string-array name="planets_array">
+        <item>Date</item>
+        <item>Name</item>
+    </string-array>
+
+</resources>
