@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddNewTask"
+            android:name=".AddNewTaskActivity"
             android:label="@string/title_activity_add_new_task" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

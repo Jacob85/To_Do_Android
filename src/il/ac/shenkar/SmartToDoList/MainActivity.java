@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener
         setContentView(R.layout.activity_main);
         
         // here i am calling the function that retrieve the data to me
-        DataModel datamodel= DataModel.getInstance();
+        DataModel datamodel= DataModel.getInstance(this);
         
         final ListView mainList = (ListView) findViewById(R.id.listView1);
         mainList.setAdapter(new TaskListBaseAdapter(this,datamodel.getList()));
@@ -51,12 +51,13 @@ public class MainActivity extends Activity implements OnItemSelectedListener
 		  //building the progress dialog
         ProgressDialog progressDialod = new ProgressDialog(this);
         progressDialod.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialod.setMessage("Working");
+        //progressDialod.setMessage("Working");
+        progressDialod.setMessage("Jacob Rulez!!");
         progressDialod.setIndeterminate(true);
         progressDialod.setCancelable(false);
 		progressDialod.show();
 		
-		DataModel model = DataModel.getInstance();
+		DataModel model = DataModel.getInstance(this);
 		String msg = (String) view.getTag(); 
 		model.removeTask(msg);
 		progressDialod.cancel();
@@ -76,7 +77,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener
 	 */ 
 	 public void AddNewTask(View view)
      {
-     	Intent intent = new Intent(this, AddNewTask.class);
+     	Intent intent = new Intent(this, AddNewTaskActivity.class);
      	startActivity(intent);
      }
 	
@@ -103,7 +104,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener
 		//Retrieve the user selection from the drop down 
 		String sortBy =	(String) parent.getItemAtPosition(pos);	
 		//Sort the list by the user demand;
-		DataModel model = DataModel.getInstance();
+		DataModel model = DataModel.getInstance(this);
 		model.sortBy(sortBy);
 		
 		progressDialod.cancel();

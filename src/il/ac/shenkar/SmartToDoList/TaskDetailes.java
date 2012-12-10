@@ -25,6 +25,13 @@ public class TaskDetailes
 		this.taskDescription = taskDescription;
 		this.createDate = System.currentTimeMillis();
 	}
+
+	public TaskDetailes(){}
+
+	public void setCreateDate(double createDate)
+	{
+		this.createDate = createDate;
+	}
 	
 
 }
