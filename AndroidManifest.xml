@@ -27,6 +27,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="il.ac.shenkar.SmartToDoList.MainActivity" />
         </activity>
+        <receiver android:name=".ReminderBroadCastReceiver">	
+		<intent-filter>	
+				<action	android:name="com.rtt.reminder_broadcast"	/>	
+		</intent-filter>	
+</receiver>
     </application>
 
 </manifest>

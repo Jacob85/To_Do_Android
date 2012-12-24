@@ -1,30 +1,60 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-     android:background="@drawable/yello_note_backround"  >
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/yello_note_backround"
+    android:orientation="vertical" >
 
     <EditText
         android:id="@+id/editText1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.23"
+        android:ems="10"
+        android:hint="Please Enter The Task Detailes"
+        android:inputType="textMultiLine" >
+
+        <requestFocus />
+    </EditText>
+
+    <CheckBox
+        android:id="@+id/checkBox1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:ems="10" >
+        android:layout_marginTop="82dp"
+        android:onClick="EnableReminder"
+        android:text="Enable Time Reminder" />
 
-    </EditText>
+    <Button
+        android:id="@+id/datePickerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/checkBox1"
+        android:layout_marginTop="20dp"
+        android:onClick="showDatePicker"
+        android:text="Pick Date"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/timePickerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:onClick="ShowTimePicker"
+        android:text="Pick Time"
+        android:visibility="invisible" />
 
     <Button
         android:id="@+id/button1"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/editText1"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/editText1"
-        android:background="@drawable/gray_button"
-        android:text="@string/done_button" 
-        android:onClick="createNewTask">
-        
-    </Button>
-</RelativeLayout>
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="30dp"
+        android:onClick="createNewTask"
+        android:text="@string/done_button" />
+
+</LinearLayout>

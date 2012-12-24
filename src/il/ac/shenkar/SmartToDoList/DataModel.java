@@ -102,11 +102,13 @@ public class DataModel extends SQLiteOpenHelper
 	public void removeTask(String toDeleteString)
 	{	
 		// first I'll get the task ii ant to delete
-		TaskDetailes toDeleteTask = this.list.get(getPositionFromDescription(toDeleteString));
-		
+		int id = getPositionFromDescription(toDeleteString);
+		TaskDetailes toDeleteTask = this.list.get(id);
+				
 		// i'll remove the task from the database
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_NAME, CR_DA + "=?", new String [] {String.valueOf(toDeleteTask.getCreateDate())});
+		
+		db.delete(TABLE_NAME,CR_DA+ "=?",new String [] {String.valueOf(toDeleteTask.getCreateDate())});
 		db.close();
 		
 		// here i will remove the task from the arraylist
