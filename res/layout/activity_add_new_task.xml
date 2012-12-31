@@ -8,14 +8,20 @@
     <EditText
         android:id="@+id/editText1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.23"
+        android:layout_height="44dp"
         android:ems="10"
         android:hint="Please Enter The Task Detailes"
         android:inputType="textMultiLine" >
 
         <requestFocus />
     </EditText>
+
+    <Button
+        android:id="@+id/RandomButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Random Task"
+        android:onClick="Random" />
 
     <CheckBox
         android:id="@+id/checkBox1"

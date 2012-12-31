@@ -1,8 +1,11 @@
 package il.ac.shenkar.SmartToDoList;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -43,12 +46,21 @@ public class MainActivity extends Activity implements OnItemSelectedListener
 	     // Apply the adapter to the spinner
 	     spinner.setAdapter(adapter);
 	     spinner.setOnItemSelectedListener(this);
-          
+	     
+	     //service intent
+	     Intent serviceIntent = new Intent(this, DailyTaskService.class);
+	     PendingIntent pending = PendingIntent.getService(this,0, serviceIntent, 0);
+	     AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);  
+	     Calendar cal = Calendar.getInstance();
+	     cal.set(cal.HOUR_OF_DAY, 23);
+	     cal.set(cal.MINUTE, 59);
+	     cal.set(cal.SECOND, 59);
+	     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pending);
     }
 	
 	public void doneButtonPreased(View view)
 	{
-		  //building the progress dialog
+		 //building the progress dialog
         ProgressDialog progressDialod = new ProgressDialog(this);
         progressDialod.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         //progressDialod.setMessage("Working");

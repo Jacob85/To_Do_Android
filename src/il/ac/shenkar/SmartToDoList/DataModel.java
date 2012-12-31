@@ -99,16 +99,35 @@ public class DataModel extends SQLiteOpenHelper
 		
 	}
 	
+	// i use this function only to add to the DB from the service
+	public void addNewTaskWithoutNotify(String msg)
+	{
+		// adding the new task to the list
+		TaskDetailes toAdd = new TaskDetailes(msg);
+		this.list.add(toAdd);
+		
+		// adding the new task to the database
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();	
+		values.put(this.CR_DA, toAdd.getCreateDate()); 
+		values.put(this.TA_DES, msg);
+		
+		db.insert(TABLE_NAME, null, values);
+		db.close(); // Closing database connection
+		
+	}
+	
 	public void removeTask(String toDeleteString)
 	{	
-		// first I'll get the task ii ant to delete
+		// first I'll get the task i want to delete
 		int id = getPositionFromDescription(toDeleteString);
 		TaskDetailes toDeleteTask = this.list.get(id);
 				
 		// i'll remove the task from the database
 		SQLiteDatabase db = this.getWritableDatabase();
-		
-		db.delete(TABLE_NAME,CR_DA+ "=?",new String [] {String.valueOf(toDeleteTask.getCreateDate())});
+				
+		db.delete(TABLE_NAME,CR_DA+ "= ?", new String[] {String.valueOf(toDeleteTask.getCreateDate())});
 		db.close();
 		
 		// here i will remove the task from the arraylist
@@ -148,7 +167,7 @@ public class DataModel extends SQLiteOpenHelper
 			do 
 			{
 				TaskDetailes newTask = new TaskDetailes();
-				newTask.setCreateDate(Double.parseDouble(cursor.getString(0)));
+				newTask.setCreateDate(cursor.getDouble(0));
 				newTask.setTaskDescription(cursor.getString(1));
 				
 				// adding the new task to the list

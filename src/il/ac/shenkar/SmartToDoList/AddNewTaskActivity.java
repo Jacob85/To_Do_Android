@@ -1,7 +1,19 @@
 package il.ac.shenkar.SmartToDoList;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -34,7 +46,7 @@ import android.text.format.DateFormat;
 @TargetApi(11)
 public class AddNewTaskActivity extends Activity {
 
-	
+	private ProgressDialog progressDialod;
 	private int reminderHour;
 	private int reminderMinute;
 	private int reminderDay;
@@ -164,12 +176,68 @@ public class AddNewTaskActivity extends Activity {
   
     }
     
+    /**
+     * this function is been invoked when the user press the random button
+     * @param view
+     * @throws MalformedURLException 
+     */
+    public void Random(View view) throws MalformedURLException
+    {
+    	//starting the spinner
+        myProgressDialogStart("Download Task From Web Server...");
+		URL url = new URL("http://mobile1-tasks-dispatcher.herokuapp.com/task/random");
+    	new GetFromWebTask().execute(url);
+    	
+    }
+    
+    // creating the progress dialog
+   public void myProgressDialogStart(String msg)
+    {
+    	//building the progress dialog
+        this.progressDialod = new ProgressDialog(this);
+        progressDialod.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialod.setMessage(msg);
+        progressDialod.setIndeterminate(true);
+        progressDialod.setCancelable(false);
+		progressDialod.show();
+    }
+   
+   //canceling the progress dialog
+   public void myProgressDialogStop() {this.progressDialod.cancel();}
+    
+    public String getFromWeb(URL url)
+    {
+    	try
+		{
+    		//open connection
+    		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+			// Fetching the string 
+    		InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+			InputStreamReader inReader = new InputStreamReader(in);
+			BufferedReader bufferedReader = new BufferedReader(inReader);
+			StringBuilder responseBuilder = new StringBuilder();
+			for (String line = bufferedReader.readLine();line!=null; line = bufferedReader.readLine())
+			{
+				responseBuilder.append(line);
+			}
+			
+			urlConnection.disconnect();
+			return responseBuilder.toString();
+		} catch (IOException e)
+		{
+	
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_add_new_task, menu);
         return true;
     }
-
+    
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -290,6 +358,36 @@ public class AddNewTaskActivity extends Activity {
 
 
     
+	
+	private class GetFromWebTask extends AsyncTask<URL, Integer, String>
+	{
+
+		@Override
+		protected String doInBackground(URL... params)
+		{
+			String result = getFromWeb(params[0]);
+
+		return result;
+		}
+
+		@Override
+		protected void onPostExecute(String result)
+		{
+			try
+			{
+				JSONObject Json = new JSONObject(result);
+				EditText textview = (EditText) findViewById(R.id.editText1);
+				textview.setText(Json.getString("topic")+", "+ Json.getString("description"));
+				myProgressDialogStop();
+			} catch (JSONException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
     
     
 
