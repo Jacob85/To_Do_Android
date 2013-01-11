@@ -34,9 +34,10 @@ public class DailyTaskService extends IntentService
 			String response =  getFromWeb(url);
 			JSONObject Json = new JSONObject(response);
 			// creating the new task
-			String description = Json.getString("topic")+", "+ Json.getString("description");
+			String description = Json.getString("description");
+			String title =  Json.getString("topic");
 			DataModel model = DataModel.getInstance(this);
-			model.addNewTaskWithoutNotify(description);
+			model.addNewTaskWithoutNotify(title, description, false, 0);
 			return;
 		} catch (MalformedURLException e)
 		{

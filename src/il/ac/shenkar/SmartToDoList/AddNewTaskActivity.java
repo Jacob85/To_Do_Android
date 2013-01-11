@@ -13,6 +13,8 @@ import java.util.Calendar;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
@@ -26,11 +28,16 @@ import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView.FindListener;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -102,8 +109,31 @@ public class AddNewTaskActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_task);
- 
+        
     }
+	
+	// this code is for hiding The soft keyboard when a touch is done anywhere outside the EditText 
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+
+	    View v = getCurrentFocus();
+	    boolean ret = super.dispatchTouchEvent(event);
+
+	    if (v instanceof EditText) {
+	        View w = getCurrentFocus();
+	        int scrcoords[] = new int[2];
+	        w.getLocationOnScreen(scrcoords);
+	        float x = event.getRawX() + w.getLeft() - scrcoords[0];
+	        float y = event.getRawY() + w.getTop() - scrcoords[1];
+
+	        if (event.getAction() == MotionEvent.ACTION_UP && (x < w.getLeft() || x >= w.getRight() || y < w.getTop() || y > w.getBottom()) ) { 
+
+	            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+	            imm.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
+	        }
+	    }
+	return ret;
+	}
 
 	private boolean isReminderValid()
 	{
@@ -137,6 +167,9 @@ public class AddNewTaskActivity extends Activity {
     	
     	EditText TextTitle= (EditText) findViewById(R.id.editText1);
     	String msgTitle = TextTitle.getText().toString();
+    	EditText TextTitle1= (EditText) findViewById(R.id.editTextTaskDescription);
+    	String msgDescriptuon = TextTitle1.getText().toString();
+    	
     	// we will check the text field is not empty
     	if (msgTitle.equals(""))
     	{
@@ -165,13 +198,21 @@ public class AddNewTaskActivity extends Activity {
     		c.set(this.getReminderYear(),getReminderMonth(), getReminderDay(), getReminderHour(), getReminderMinute());
     		
     		alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingInent);
-    	
+    		
+    		DataModel model = DataModel.getInstance(this);
+    		model.addNewTask(msgTitle, msgDescriptuon, true,(int)c.getTimeInMillis());
+    		finish();
     	}
    
-    	// here anyway we add the task to the DB
+    	else //here we will not add reminder
+    	{
+    		
+    		// here anyway we add the task to the DB
     		DataModel model = DataModel.getInstance(this);
-    		model.addNewTask(msgTitle);
+    		model.addNewTask(msgTitle, msgDescriptuon, false,0);
     		finish();
+    	}
+    	
    
   
     }
@@ -183,11 +224,40 @@ public class AddNewTaskActivity extends Activity {
      */
     public void Random(View view) throws MalformedURLException
     {
+    	// first we will check if we got internet connection
+    	ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE); 
+    	NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+    	
+    	// if we have no internet connection
+    	if (activeNetwork == null)
+    	{
+    		// i need to desplay error massage to the user
+    		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+    		// set title
+    		alertDialogBuilder.setTitle("Internet Connection Error");  	
+    		// set dialog message
+    		alertDialogBuilder.setMessage("Please connect the internet and Try again")
+    						  .setCancelable(false)
+    						  .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+    							public void onClick(DialogInterface dialog,int id) {
+    								// if this button is clicked, close the dilaog
+    								dialog.cancel();
+    								return;
+    							}
+    						  });
+    		// create alert dialog
+			AlertDialog alertDialog = alertDialogBuilder.create();
+			// show it
+			alertDialog.show();
+    	}
+    	else			// start to fatch the Task
+    	{
+    		
     	//starting the spinner
         myProgressDialogStart("Download Task From Web Server...");
 		URL url = new URL("http://mobile1-tasks-dispatcher.herokuapp.com/task/random");
     	new GetFromWebTask().execute(url);
-    	
+    	}
     }
     
     // creating the progress dialog
@@ -377,7 +447,9 @@ public class AddNewTaskActivity extends Activity {
 			{
 				JSONObject Json = new JSONObject(result);
 				EditText textview = (EditText) findViewById(R.id.editText1);
-				textview.setText(Json.getString("topic")+", "+ Json.getString("description"));
+				EditText textDescription = (EditText) findViewById(R.id.editTextTaskDescription);
+				textview.setText(Json.getString("topic"));
+				textDescription.setText(Json.getString("description"));
 				myProgressDialogStop();
 			} catch (JSONException e)
 			{

@@ -3,15 +3,17 @@
     <string name="app_name">Smart To Do List</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">To Do</string>
     <string name="add_button">Add Task</string>
     <string name="done_button">Create</string>
     <string name="Task_Done">Done</string>
+    <string name="internrt_connection_error">Error! You must have internet connection to continue</string>
     <string name="Task_URL">http://mobile1-tasks-dispatcher.herokuapp.com/task/random</string>
+    <string name="add_task_icon">Add Task</string>
     <string name="title_activity_add_new_task">Add New Task</string>
     <string-array name="planets_array">
-        <item>Date</item>
-        <item>Name</item>
+        <item>Sort By Date</item>
+        <item>Sort By Name</item>
     </string-array>
 
 </resources>

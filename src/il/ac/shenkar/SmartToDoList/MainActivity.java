@@ -3,26 +3,37 @@ package il.ac.shenkar.SmartToDoList;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SlidingDrawer;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnItemSelectedListener 
+public class MainActivity extends Activity implements OnNavigationListener
 {
+
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,18 +45,27 @@ public class MainActivity extends Activity implements OnItemSelectedListener
         
         final ListView mainList = (ListView) findViewById(R.id.listView1);
         mainList.setAdapter(new TaskListBaseAdapter(this,datamodel.getList()));
+        mainList.setOnItemClickListener(new OnItemClickListener()
+		{
+
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3)
+			{
+				Toast.makeText(getApplicationContext(),
+					      "Click ListItem Number " + arg2, Toast.LENGTH_LONG)
+					      .show();
+				
+			}
+        	
+		});
         datamodel.setAdapter((BaseAdapter) mainList.getAdapter());
-          
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.planets_array, android.R.layout.simple_spinner_item);
+        ActionBar myActionBar = getActionBar();
+        myActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        myActionBar.setListNavigationCallbacks(adapter, this);
         
-        Spinner spinner = (Spinner) findViewById(R.id.planets_spinner);
-	     // Create an ArrayAdapter using the string array and a default spinner layout
-	     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-	             R.array.planets_array, android.R.layout.simple_spinner_item);
-	     // Specify the layout to use when the list of choices appears
-	     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	     // Apply the adapter to the spinner
-	     spinner.setAdapter(adapter);
-	     spinner.setOnItemSelectedListener(this);
 	     
 	     //service intent
 	     Intent serviceIntent = new Intent(this, DailyTaskService.class);
@@ -56,8 +76,22 @@ public class MainActivity extends Activity implements OnItemSelectedListener
 	     cal.set(cal.MINUTE, 59);
 	     cal.set(cal.SECOND, 59);
 	     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pending);
+	     
+	    
     }
 	
+
+
+	// this method is called when the Action items is preaed
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		AddNewTask(null);
+		return true;
+	}
+
+
+
 	public void doneButtonPreased(View view)
 	{
 		 //building the progress dialog
@@ -98,34 +132,44 @@ public class MainActivity extends Activity implements OnItemSelectedListener
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		getMenuInflater().inflate(R.menu.activity_main, menu);
+		getMenuInflater().inflate(R.menu.main_avtivity_menu, menu);
 		return true;
 	}
 
-	public void onItemSelected(AdapterView<?> parent, View view, int pos,
-			long id)
+
+
+	public boolean onNavigationItemSelected(int itemPosition, long itemId)
 	{
-		  //building the progress dialog
-        ProgressDialog progressDialod = new ProgressDialog(this);
-        progressDialod.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialod.setMessage("Working");
-        progressDialod.setIndeterminate(true);
-        progressDialod.setCancelable(false);
-		progressDialod.show();
-		
-		//Retrieve the user selection from the drop down 
-		String sortBy =	(String) parent.getItemAtPosition(pos);	
-		//Sort the list by the user demand;
+		// sort the list
+		String[] strings = getResources().getStringArray(R.array.planets_array);
 		DataModel model = DataModel.getInstance(this);
-		model.sortBy(sortBy);
-		
-		progressDialod.cancel();
+		model.sortBy(strings[itemPosition]);
+		return true;
 	}
 
-	public void onNothingSelected(AdapterView<?> arg0)
+	public void DisplayTask (View v)
 	{
-		// TODO Auto-generated method stub
+		// i need to display massage to the user
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+		// set title
+		alertDialogBuilder.setTitle("Task Details");  	
+		// set dialog message
+		alertDialogBuilder.setItems(DataModel.getInstance(this).getTaskToDisplay(v.findViewById(R.id.button1).getTag().toString()), null);
+		alertDialogBuilder.setCancelable(false)
+						  .setPositiveButton("OK",new DialogInterface.OnClickListener() {	
+							public void onClick(DialogInterface dialog,int id) {
+								// if this button is clicked, close the dilaog
+								dialog.cancel();
+								return;
+								}
+						  	});
 		
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		// show it
+		alertDialog.show();
 	}
+
+
 
 }

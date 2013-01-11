@@ -1,10 +1,13 @@
 package il.ac.shenkar.SmartToDoList;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
+import android.R.bool;
 import android.R.string;
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,6 +15,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.webkit.WebView.FindListener;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 
@@ -24,15 +28,19 @@ public class DataModel extends SQLiteOpenHelper
 	
 	// DataBase Members
 	private static final int DATABASE_VERSION =1;
-	private final static String DATABASE_NAME = "taskManager";
+	private final static String DATABASE_NAME = "taskManagers";
 	private final static String TABLE_NAME = "tasks";
 	private final String CR_DA = "createDate";
 	private final String TA_DES = "taskDescription";
+	private final String TA_TITEL = "taskTitle";
+	private final String REMINDER_FLAG = "reminderFlag";
+	private final String REMINDER_DATE = "reminderDate";
+	
 	
 	@Override
 	public void onCreate(SQLiteDatabase db)
 	{
-		String CREATE_CONTACTS_TABLE  = "CREATE TABLE " + TABLE_NAME +"(createDate REAL PRIMARY KEY, taskDescription TEXT)";
+		String CREATE_CONTACTS_TABLE  = "CREATE TABLE " + TABLE_NAME +"(createDate REAL PRIMARY KEY, taskDescription TEXT,taskTitle TEXT, reminderFlag INTEGER,reminderDate INTEGER )";
 		db.execSQL(CREATE_CONTACTS_TABLE);
 		
 	}
@@ -78,10 +86,10 @@ public class DataModel extends SQLiteOpenHelper
 	}
 	
 	
-	public void addNewTask(String msg)
+	public void addNewTask(String title,String description, boolean reminderFlag, int rminderDate )
 	{
 		// adding the new task to the list
-		TaskDetailes toAdd = new TaskDetailes(msg);
+		TaskDetailes toAdd = new TaskDetailes(title, description, reminderFlag, rminderDate);
 		this.list.add(toAdd);
 		
 		// adding the new task to the database
@@ -89,7 +97,12 @@ public class DataModel extends SQLiteOpenHelper
 		
 		ContentValues values = new ContentValues();	
 		values.put(this.CR_DA, toAdd.getCreateDate()); 
-		values.put(this.TA_DES, msg);
+		values.put(this.TA_DES, description);
+		values.put(this.TA_TITEL, title);
+		values.put(this.REMINDER_FLAG, reminderFlag);
+		if (reminderFlag)
+			values.put(this.REMINDER_DATE, rminderDate );
+		
 		
 		db.insert(TABLE_NAME, null, values);
 		db.close(); // Closing database connection
@@ -100,10 +113,10 @@ public class DataModel extends SQLiteOpenHelper
 	}
 	
 	// i use this function only to add to the DB from the service
-	public void addNewTaskWithoutNotify(String msg)
+	public void addNewTaskWithoutNotify(String title,String description, boolean reminderFlag, int rminderDate )
 	{
 		// adding the new task to the list
-		TaskDetailes toAdd = new TaskDetailes(msg);
+		TaskDetailes toAdd = new TaskDetailes(title, description, reminderFlag, rminderDate);
 		this.list.add(toAdd);
 		
 		// adding the new task to the database
@@ -111,7 +124,11 @@ public class DataModel extends SQLiteOpenHelper
 		
 		ContentValues values = new ContentValues();	
 		values.put(this.CR_DA, toAdd.getCreateDate()); 
-		values.put(this.TA_DES, msg);
+		values.put(this.TA_DES, description);
+		values.put(this.TA_TITEL, title);
+		values.put(this.REMINDER_FLAG, reminderFlag);
+		if (reminderFlag)
+			values.put(this.REMINDER_DATE, rminderDate );
 		
 		db.insert(TABLE_NAME, null, values);
 		db.close(); // Closing database connection
@@ -121,7 +138,7 @@ public class DataModel extends SQLiteOpenHelper
 	public void removeTask(String toDeleteString)
 	{	
 		// first I'll get the task i want to delete
-		int id = getPositionFromDescription(toDeleteString);
+		int id = getPositionFromTitle(toDeleteString);
 		TaskDetailes toDeleteTask = this.list.get(id);
 				
 		// i'll remove the task from the database
@@ -131,11 +148,46 @@ public class DataModel extends SQLiteOpenHelper
 		db.close();
 		
 		// here i will remove the task from the arraylist
-		this.list.remove(getPositionFromDescription(toDeleteString));
+		this.list.remove(getPositionFromTitle(toDeleteString));
 		
 		// here i will notify the GUI if my changes! 
 		this.adapter.notifyDataSetChanged();
 	}
+	
+	public String [] getTaskToDisplay(String Title)
+	{
+		// first i'll get the task from the list
+		int id = getPositionFromTitle(Title);
+		TaskDetailes toReturnTask = this.list.get(id);
+		
+		// check if the task have a reminder and decide the String[] size;
+		String[] items;
+		if (toReturnTask.HaveReminder())
+		{
+			Calendar c = Calendar.getInstance();
+			items=new String [4];
+			items[0] = toReturnTask.getTaskTitle();
+			items[1] = toReturnTask.getTaskDescription();
+			// set the calender to tha time
+			c.setTimeInMillis(toReturnTask.getReminderDate());
+			items[2] = c.getTime().toString();
+		}
+		else
+		{
+			
+			items = new String[2];
+			items[0] = toReturnTask.getTaskTitle();
+			items[1] = toReturnTask.getTaskDescription();
+
+			
+			
+		}
+		return items;
+		
+		
+	}
+	
+	
 	public ArrayList<TaskDetailes> getList()
 	{
 		return list;
@@ -145,12 +197,12 @@ public class DataModel extends SQLiteOpenHelper
 		this.list = list;
 	}
 
-	// this method is for returning the index of the element by receiving a string to the elment description
-	private int getPositionFromDescription(String toGet)
+	// this method is for returning the index of the element by receiving a string to the elment title
+	private int getPositionFromTitle(String toGet)
 	{	
 		for (int i =0; i < this.list.size();i++ )
 		{
-			if (this.list.get(i).getTaskDescription() == toGet)
+			if (this.list.get(i).getTaskTitle().equals(toGet))
 				return i;
 		}
 		return -1;
@@ -169,7 +221,17 @@ public class DataModel extends SQLiteOpenHelper
 				TaskDetailes newTask = new TaskDetailes();
 				newTask.setCreateDate(cursor.getDouble(0));
 				newTask.setTaskDescription(cursor.getString(1));
-				
+				newTask.setTaskTitle(cursor.getString(2));
+				if (cursor.getInt(3) == 0)				//reminderflag = false;
+				{
+					newTask.setHaveReminder(false);
+					
+				}
+				else
+				{
+					newTask.setHaveReminder(true);
+					newTask.setReminderDate(cursor.getInt(4));
+				}
 				// adding the new task to the list
 				list.add(newTask);
 			}while (cursor.moveToNext()); // move to the next row in the DB

@@ -53,7 +53,7 @@ public class TaskListBaseAdapter extends BaseAdapter
 		{
 			convertView = l_Inflater.inflate(R.layout.task_layout, null);
 			holder = new ViewHolder();
-			holder.txt_itemDescription = (TextView) convertView.findViewById(R.id.description);
+			holder.txt_itemTitle = (TextView) convertView.findViewById(R.id.description);
 			
 			convertView.setTag(holder);
 		} else 
@@ -65,8 +65,13 @@ public class TaskListBaseAdapter extends BaseAdapter
 		 * Here I get id for the button of this specific view and give him "tag" so i could delete it later on
 		 * */
 		currButton = (Button) convertView.findViewById(R.id.button1);
-		holder.txt_itemDescription.setText(taskDetailsrrayList.get(position).getTaskDescription());
-		currButton.setTag(holder.txt_itemDescription.getText().toString());
+		holder.txt_itemTitle.setText(taskDetailsrrayList.get(position).getTaskTitle());
+		currButton.setTag(holder.txt_itemTitle.getText().toString());
+		// this part is only for displaying and not displaying the reminder Icon
+		if (taskDetailsrrayList.get(position).HaveReminder())
+			convertView.findViewById(R.id.imageView1).setVisibility(View.VISIBLE);
+		else
+			convertView.findViewById(R.id.imageView1).setVisibility(View.INVISIBLE);
 		return convertView;
 		
 	
@@ -83,7 +88,7 @@ public class TaskListBaseAdapter extends BaseAdapter
 
 	static class ViewHolder
 	{
-		TextView txt_itemDescription;	
+		TextView txt_itemTitle;	
 	}
 }
 	

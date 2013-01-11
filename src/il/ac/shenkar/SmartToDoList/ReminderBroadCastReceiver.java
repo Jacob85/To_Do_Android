@@ -8,11 +8,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.DropBoxManager;
+import android.support.v4.app.NotificationCompat;
 
 public class ReminderBroadCastReceiver extends BroadcastReceiver
 {
 
-	@TargetApi(16)
+	@TargetApi(15)
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
@@ -21,7 +22,17 @@ public class ReminderBroadCastReceiver extends BroadcastReceiver
 		String output = intent.getStringExtra("msg");
 		
 		NotificationManager notmanaget = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-		Notification not = new Notification.Builder(context)
+		
+		NotificationCompat.Builder builder = new  NotificationCompat.Builder(context)
+																	.setTicker("Task Reminder")
+																	.setSmallIcon(R.drawable.yello_note_backround)
+																	.setContentText(output)
+																	.setContentIntent(pendingintent);
+		
+		notmanaget.notify(0,builder.build());
+		
+		
+	/*	Notification not = new Notification.Builder(context)
 					.setContentTitle("Task Reminder")
 					.setContentText(output).setSmallIcon(R.drawable.yello_note_backround)
 					.setContentIntent(pendingintent).build();
@@ -29,7 +40,7 @@ public class ReminderBroadCastReceiver extends BroadcastReceiver
 		not.flags |= Notification.FLAG_AUTO_CANCEL;
 		
 		notmanaget.notify(0,not);
-		
+		*/
 		
 		
 		

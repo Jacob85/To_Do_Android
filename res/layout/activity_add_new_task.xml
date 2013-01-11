@@ -5,60 +5,79 @@
     android:background="@drawable/yello_note_backround"
     android:orientation="vertical" >
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="324dp"
+            android:layout_height="wrap_content"
+            android:hint="Please Enter The Task title" >
+
+            <requestFocus />
+        </EditText>
+    
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/editTextTaskDescription"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="118dp"
         android:ems="10"
-        android:hint="Please Enter The Task Detailes"
-        android:inputType="textMultiLine" >
+        android:hint="Please Enter The Task Detailes optional"
+        android:inputType="textMultiLine" />
 
-        <requestFocus />
-    </EditText>
+</LinearLayout>
 
-    <Button
-        android:id="@+id/RandomButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Random Task"
-        android:onClick="Random" />
-
-    <CheckBox
-        android:id="@+id/checkBox1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="82dp"
-        android:onClick="EnableReminder"
-        android:text="Enable Time Reminder" />
-
-    <Button
-        android:id="@+id/datePickerButton"
+    <RelativeLayout 
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/checkBox1"
-        android:layout_marginTop="20dp"
-        android:onClick="showDatePicker"
-        android:text="Pick Date"
-        android:visibility="invisible" />
+        android:layout_height="wrap_content" >
 
-    <Button
-        android:id="@+id/timePickerButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:onClick="ShowTimePicker"
-        android:text="Pick Time"
-        android:visibility="invisible" />
+            <Button
+                android:id="@+id/RandomButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="Random"
+                android:text="Random Task" />
+
+            <CheckBox
+                android:id="@+id/checkBox1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/RandomButton"
+                android:onClick="EnableReminder"
+                android:text="Enable Reminder" />
+
+	</RelativeLayout>
+
+        <Button
+            android:id="@+id/datePickerButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/checkBox1"
+            android:layout_marginTop="20dp"
+            android:onClick="showDatePicker"
+            android:text="Pick Date"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/timePickerButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:onClick="ShowTimePicker"
+            android:text="Pick Time"
+            android:visibility="invisible" />
 
     <Button
         android:id="@+id/button1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
         android:layout_marginBottom="30dp"
         android:onClick="createNewTask"
         android:text="@string/done_button" />
